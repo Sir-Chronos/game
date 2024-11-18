@@ -5,6 +5,7 @@ namespace RPG.Utils
 {
     public static class CharacterFactory
     {
+        // Factory to create a new player with default stats
         public static BaseCharacter PlayerFactory(string characterClass)
         {
             return characterClass.ToLower() switch
@@ -16,6 +17,19 @@ namespace RPG.Utils
             };
         }
 
+        // Overloaded factory to create a player with stats from a memento
+        public static BaseCharacter PlayerFactory(CharacterMemento memento)
+        {
+            return memento.ClassName.ToLower() switch
+            {
+                "knight" => new Knight(memento.Health, memento.Defense, memento.AttackPower),
+                "mage" => new Mage(memento.Health, memento.Defense, memento.AttackPower),
+                "archer" => new Archer(memento.Health, memento.Defense, memento.AttackPower),
+                _ => throw new ArgumentException("Invalid character class.")
+            };
+        }
+
+        // Factory to create enemies
         public static BaseCharacter EnemyFactory(string enemyType)
         {
             return enemyType.ToLower() switch

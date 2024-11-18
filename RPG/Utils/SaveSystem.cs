@@ -5,14 +5,15 @@ namespace RPG.Utils
 {
     internal class SaveSystem
     {
-        private static string saveFilePath = "savefile.json";
+        private static readonly string saveFilePath = "savefile.json";
 
-        // Método para salvar o personagem em um arquivo JSON
+        // Save the character's memento to a file
         public static void SaveCharacter(BaseCharacter character)
         {
             try
             {
-                string json = JsonSerializer.Serialize(character);
+                var memento = character.SaveState(); // Create a memento
+                string json = JsonSerializer.Serialize(memento);
                 File.WriteAllText(saveFilePath, json);
                 Console.WriteLine("Game saved successfully!");
             }
@@ -22,7 +23,7 @@ namespace RPG.Utils
             }
         }
 
-        // Método para carregar o personagem de um arquivo JSON
+        // Load the character's state from a file and apply it
         public static BaseCharacter LoadCharacter()
         {
             try
@@ -34,9 +35,15 @@ namespace RPG.Utils
                 }
 
                 string json = File.ReadAllText(saveFilePath);
-                BaseCharacter character = JsonSerializer.Deserialize<BaseCharacter>(json);
-                Console.WriteLine("Game loaded successfully!");
-                return character;
+                var memento = JsonSerializer.Deserialize<CharacterMemento>(json);
+
+                if (memento == null)
+                {
+                    Console.WriteLine("Error: Invalid save file.");
+                    return null;
+                }
+
+                return CharacterFactory.PlayerFactory(memento); // Use the overloaded method
             }
             catch (Exception ex)
             {
@@ -44,5 +51,6 @@ namespace RPG.Utils
                 return null;
             }
         }
+
     }
 }

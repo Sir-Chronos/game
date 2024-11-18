@@ -1,35 +1,37 @@
-﻿namespace RPG.Characters
+﻿using RPG.Utils;
+
+namespace RPG.Characters
 {
     public abstract class BaseCharacter
     {
-        // Attributes
         public int Health { get; protected set; }
         public int Defense { get; protected set; }
         public int AttackPower { get; protected set; }
+        public string ClassName { get; protected set; }
 
-        // Constructor
-        protected BaseCharacter(int health, int defense, int attackPower)
+        protected BaseCharacter(int health, int defense, int attackPower, string className)
         {
             Health = health;
             Defense = defense;
             AttackPower = attackPower;
+            ClassName = className;
         }
 
-        // Method to take damage
-        public virtual void TakeDamage(int damage)
+        // Create a memento with the character's state
+        public CharacterMemento SaveState()
         {
-            int damageTaken = damage - Defense;
-            if (damageTaken > 0)
-            {
-                Health -= damageTaken;
-                if (Health < 0) Health = 0; // Prevent negative health
-            }
+            return new CharacterMemento(ClassName, Health, Defense, AttackPower);
         }
 
-        // Method to attack another character
-        public virtual void PerformAttack(BaseCharacter target)
+        // Restore the character's state from a memento
+        public void RestoreState(CharacterMemento memento)
         {
-            target.TakeDamage(AttackPower);
+            if (memento == null)
+                throw new ArgumentNullException(nameof(memento));
+
+            Health = memento.Health;
+            Defense = memento.Defense;
+            AttackPower = memento.AttackPower;
         }
     }
 }
