@@ -1,6 +1,6 @@
-﻿using RPG.Utils;
+﻿using RPG;
 using RPG.Characters;
-using RPG; // Ensure this is included if Character is part of this namespace
+using RPG.Utils;
 
 class Program
 {
@@ -25,8 +25,15 @@ class Program
             switch (choice)
             {
                 case "1":
-                    player = CharacterFactory.PlayerFactory(); // Create a new character
-                    Game.Start(player); // Start the game with the new character
+                    player = CreateNewCharacter(); // Create a new character
+                    if (player != null)
+                    {
+                        Game.Start(player); // Start the game with the new character
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid character class selected. Please try again.");
+                    }
                     break;
                 case "2":
                     player = SaveSystem.LoadCharacter(); // Load saved character
@@ -34,9 +41,13 @@ class Program
                     {
                         Game.Start(player); // Start the game with the loaded character
                     }
+                    else
+                    {
+                        Console.WriteLine("No saved character found.");
+                    }
                     break;
                 case "3":
-                    // Multiplayer feature placeholder
+                    Console.WriteLine("Multiplayer is not implemented yet.");
                     break;
                 case "4":
                     exit = true;
@@ -53,5 +64,26 @@ class Program
                 Console.ReadKey();
             }
         }
+    }
+
+    private static BaseCharacter CreateNewCharacter()
+    {
+        Console.Clear();
+        Console.WriteLine("Choose your character class:");
+        Console.WriteLine("1. Knight");
+        Console.WriteLine("2. Mage");
+        Console.WriteLine("3. Archer");
+
+        Console.Write("\nSelect a class: ");
+        string classChoice = Console.ReadLine();
+
+        // Use a switch expression to return the correct character, or null if invalid.
+        return classChoice switch
+        {
+            "1" => CharacterFactory.PlayerFactory("knight"),
+            "2" => CharacterFactory.PlayerFactory("mage"),
+            "3" => CharacterFactory.PlayerFactory("archer"),
+            _ => null // Return null if the choice is invalid
+        };
     }
 }
