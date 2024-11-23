@@ -1,56 +1,28 @@
-﻿using RPG.Characters;
+﻿using System;
+using System.IO;
 using System.Text.Json;
 
 namespace RPG.Utils
 {
-    internal class SaveSystem
+    public static class SaveSystem
     {
-        private static readonly string saveFilePath = "savefile.json";
-
-        // Save the character's memento to a file
-        public static void SaveCharacter(BaseCharacter character)
+        public static void Save(CharacterMemento memento, string fileName)
         {
-            try
-            {
-                var memento = character.SaveState(); // Create a memento
-                string json = JsonSerializer.Serialize(memento);
-                File.WriteAllText(saveFilePath, json);
-                Console.WriteLine("Game saved successfully!");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving game: {ex.Message}");
-            }
+            string json = JsonSerializer.Serialize(memento);
+            File.WriteAllText(fileName, json);
+            Console.WriteLine($"Estado salvo em {fileName}");
         }
 
-        // Load the character's state from a file and apply it
-        public static BaseCharacter LoadCharacter()
+        public static CharacterMemento? Load(string fileName)
         {
-            try
+            if (!File.Exists(fileName))
             {
-                if (!File.Exists(saveFilePath))
-                {
-                    Console.WriteLine("No save file found.");
-                    return null;
-                }
-
-                string json = File.ReadAllText(saveFilePath);
-                var memento = JsonSerializer.Deserialize<CharacterMemento>(json);
-
-                if (memento == null)
-                {
-                    Console.WriteLine("Error: Invalid save file.");
-                    return null;
-                }
-
-                return CharacterFactory.PlayerFactory(memento); // Use the overloaded method
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading game: {ex.Message}");
+                Console.WriteLine("Arquivo de save não encontrado.");
                 return null;
             }
-        }
 
+            string json = File.ReadAllText(fileName);
+            return JsonSerializer.Deserialize<CharacterMemento>(json);
+        }
     }
 }
