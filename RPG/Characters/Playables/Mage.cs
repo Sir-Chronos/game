@@ -1,25 +1,22 @@
-﻿namespace RPG.Characters.Playables
+﻿using RPG.Characters;
+
+namespace RPG.Characters.Playables
 {
-    internal class Mage : BaseCharacter
+    public class Mage : BaseCharacter
     {
-        // Constructor
         public Mage(int health, int defense, int attackPower)
-            : base(health, defense, attackPower)
+            : base(health, defense, attackPower, "Necromancer")
         {
         }
 
-        // Mages take extra damage but deal more damage
         public override void TakeDamage(int damage)
         {
-            int increasedDamage = (int)(damage * 1.2); // Take 20% more damage
-            base.TakeDamage(increasedDamage);
-        }
+            int magicShield = 5; // Exemplo de escudo mágico que reduz dano fixo
+            int damageTaken = Math.Max(0, damage - (Defense + magicShield));
+            Health -= damageTaken;
 
-        public override void PerformAttack(BaseCharacter target)
-        {
-            int enhancedAttack = (int)(AttackPower * 1.3); // Deal 30% more damage
-            target.TakeDamage(enhancedAttack);
+            Console.WriteLine($"{GetType().Name} recebeu {damageTaken} de dano após escudo mágico. Saúde restante: {Health}");
+            NotifyObservers();
         }
     }
-
 }
