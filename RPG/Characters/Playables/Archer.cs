@@ -1,23 +1,23 @@
-﻿namespace RPG.Characters.Playables
-{
-    internal class Archer : BaseCharacter
-    {
-        private static readonly Random Randomizer = new Random();
+﻿using RPG.Characters;
 
-        // Constructor
+namespace RPG.Characters.Playables
+{
+    public class Archer : BaseCharacter
+    {
         public Archer(int health, int defense, int attackPower)
-            : base(health, defense, attackPower)
+            : base(health, defense, attackPower, "Goblin")
         {
         }
 
-        // Archers take normal damage but can attack multiple times with randomized damage
         public override void PerformAttack(BaseCharacter target)
         {
-            for (int i = 0; i < 2; i++) // Attack twice
-            {
-                int randomDamage = Randomizer.Next((int)(AttackPower * 0.8), (int)(AttackPower * 1.2) + 1);
-                target.TakeDamage(randomDamage);
-            }
+            bool isCriticalHit = new Random().Next(0, 100) < 25; // 25% chance de crítico
+            int damage = isCriticalHit ? AttackPower * 2 : AttackPower;
+
+            Console.WriteLine($"{GetType().Name} dispara {(isCriticalHit ? "um golpe crítico" : "uma flecha")} causando {damage} de dano!");
+            target.TakeDamage(damage);
+
+            NotifyObservers();
         }
     }
 }
