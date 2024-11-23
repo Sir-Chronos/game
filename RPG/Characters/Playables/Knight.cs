@@ -1,23 +1,22 @@
-﻿namespace RPG.Characters.Playables
+﻿using RPG.Characters;
+
+namespace RPG.Characters.Playables
 {
-    internal class Knight : BaseCharacter
+    public class Knight : BaseCharacter
     {
-        // Constructor
         public Knight(int health, int defense, int attackPower)
-            : base(health, defense, attackPower)
+            : base(health, defense, attackPower, "Orc")
         {
         }
 
         public override void TakeDamage(int damage)
         {
-            int reducedDamage = (int)(damage * 0.7); // Reduce damage by 30%
-            base.TakeDamage(reducedDamage);
-        }
+            int heavyArmorReduction = 10; // Exemplo de redução adicional para o Cavaleiro
+            int damageTaken = Math.Max(0, damage - (Defense + heavyArmorReduction));
+            Health -= damageTaken;
 
-        public override void PerformAttack(BaseCharacter target)
-        {
-            int enhancedAttack = AttackPower;
-            target.TakeDamage(enhancedAttack);
+            Console.WriteLine($"{GetType().Name} recebeu {damageTaken} de dano após proteção pesada. Saúde restante: {Health}");
+            NotifyObservers();
         }
     }
 }
