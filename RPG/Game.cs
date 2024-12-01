@@ -1,5 +1,4 @@
-﻿using System;
-using RPG.Characters;
+﻿using RPG.Characters;
 using RPG.Strategy;
 using RPG.Observer;
 using RPG.Singleton;
@@ -9,6 +8,8 @@ namespace RPG
 {
     public static class Game
     {
+        private static GameSubject _gameSubject = new GameSubject(); // Instância do GameSubject
+
         private static CharacterMemento SaveCharacterState(BaseCharacter character)
         {
             return new CharacterMemento(
@@ -24,15 +25,32 @@ namespace RPG
             return CharacterFactory.PlayerFactory(memento);
         }
 
-        public static void Start(BaseCharacter player, BaseCharacter enemy)
+        public static void Start(BaseCharacter? player)  // player é agora anulável
         {
-            if (player == null || enemy == null)
+            if (player == null)
             {
-                throw new ArgumentNullException("Os personagens não podem ser nulos.");
+                Console.WriteLine("Nenhum personagem válido. O jogo será encerrado.");
+                return;
             }
 
+            // Etapa 1: Exibir classe escolhida
+            Console.WriteLine($"Você escolheu {player.GetType().Name}!");  // Usando GetType().Name para mostrar a classe
+
+            // Etapa 2: Criar inimigo aleatório
+            Console.WriteLine("Um inimigo se aproxima...");
+            var enemyTypes = new[] { "orc", "goblin", "necromancer" };
+            var randomEnemyType = enemyTypes[new Random().Next(enemyTypes.Length)];
+            var enemy = CharacterFactory.EnemyFactory(randomEnemyType);
+            Console.WriteLine($"Você enfrenta um {randomEnemyType}!");
+
+
+            // Registra o HealthObserver para monitorar o estado de saúde do personagem
+            HealthObserver healthObserver = new HealthObserver();
+            _gameSubject.RegisterObserver(healthObserver);
+
+            // Etapa 3: Iniciar batalha
             Console.WriteLine("\nA batalha começou!");
-            Console.WriteLine($"Você está enfrentando um {enemy.CharacterType}!");
+            Console.WriteLine($"Você está enfrentando um {enemy.GetType().Name}!");  // Usando GetType().Name para mostrar o inimigo
 
             while (player.IsAlive && enemy.IsAlive)
             {
@@ -46,11 +64,11 @@ namespace RPG
                         break;
                     case "2":
                         player.AttackStrategy = new DefenseStrategy(10); // Aplicando defesa temporária
-                        Console.WriteLine($"{player.CharacterType} se preparou para defesa!");
+                        Console.WriteLine($"{player.GetType().Name} se preparou para defesa!");
                         break;
                     case "3":
                         player.AttackStrategy = new SpecialAbilityStrategy(); // Usando habilidade especial
-                        Console.WriteLine($"{player.CharacterType} usou uma habilidade especial!");
+                        Console.WriteLine($"{player.GetType().Name} usou uma habilidade especial!");
                         break;
                     case "4":
                         var savedState = SaveCharacterState(player);
@@ -67,32 +85,36 @@ namespace RPG
                 }
 
                 // Exibir informações antes de realizar o ataque
-                Console.WriteLine($"\n{player.CharacterType} está atacando!");
+                Console.WriteLine($"\n{player.GetType().Name} está atacando!");
                 player.PerformAttack(enemy);  // Realiza o ataque
 
                 if (!enemy.IsAlive)
                 {
-                    Console.WriteLine($"{enemy.CharacterType} foi derrotado!");
+                    Console.WriteLine($"{enemy.GetType().Name} foi derrotado!");
                     GameState.Instance.IncreaseScore(100);
                     break;
                 }
 
                 // Exibir informações antes de o inimigo atacar
-                Console.WriteLine($"\n{enemy.CharacterType} contra-ataca!");
+                Console.WriteLine($"\n{enemy.GetType().Name} contra-ataca!");
                 enemy.AttackStrategy = new BasicAttackStrategy();
                 enemy.PerformAttack(player);
 
                 if (!player.IsAlive)
                 {
-                    Console.WriteLine($"{player.CharacterType} foi derrotado! Game Over.");
+                    Console.WriteLine($"{player.GetType().Name} foi derrotado! Game Over.");
                     break;
                 }
 
                 // Exibir status de saúde após cada rodada
-                Console.WriteLine($"\n{player.CharacterType} agora tem {player.Health} de saúde.");
-                Console.WriteLine($"{enemy.CharacterType} agora tem {enemy.Health} de saúde.");
-            }
-        }
+                Console.WriteLine($"\n{player.GetType().Name} agora tem {player.Health} de saúde.");
+                Console.WriteLine($"{enemy.GetType().Name} agora tem {enemy.Health} de saúde.");
 
+                // Notificar os observadores sobre o estado do personagem
+                _gameSubject.ChangeCharacterState(player);
+            }
+
+            Console.WriteLine("Obrigado por jogar!");
+        }
     }
 }
