@@ -1,4 +1,4 @@
-﻿namespace RPG.Utils
+﻿namespace RPG.Characters
 {
     public class CharacterMemento
     {
