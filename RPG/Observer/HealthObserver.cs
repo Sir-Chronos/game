@@ -1,23 +1,30 @@
-using System;
 using RPG.Characters;
+using System;
 
-namespace RPG.Observer
+namespace RPG
 {
-  public class HealthObserver : IObserver<BaseCharacter>
-  {
-    public void OnNext(BaseCharacter character)
+    public class HealthObserver : IObserver<BaseCharacter>
     {
-      Console.WriteLine($"{character.GetType().Name} agora tem {character.Health} de saúde.");
-    }
+        // Implementação do método OnNext para reagir às mudanças no estado de BaseCharacter
+        public void OnNext(BaseCharacter character)
+        {
+            // Aqui verificamos se a saúde do personagem foi alterada e fazemos algo
+            Console.WriteLine($"{character.GetType().Name} tem {character.Health} de saúde.");
+            if (character.Health <= 0)
+            {
+                Console.WriteLine($"{character.GetType().Name} morreu!");
+            }
+        }
 
-    public void OnError(Exception error)
-    {
-      Console.WriteLine($"Erro: {error.Message}");
-    }
+        // Esses dois métodos são necessários, mas não precisamos implementá-los agora para o caso simples
+        public void OnCompleted()
+        {
+            // Podemos deixar vazio por enquanto
+        }
 
-    public void OnCompleted()
-    {
-      Console.WriteLine("Notificações concluídas.");
+        public void OnError(Exception error)
+        {
+            // Podemos deixar vazio por enquanto
+        }
     }
-  }
 }
