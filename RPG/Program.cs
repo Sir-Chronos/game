@@ -6,84 +6,89 @@ class Program
 {
     private static void Main(string[] args)
     {
-        BaseCharacter player = null; // Declare player here for access in all cases
+        BaseCharacter? player = null; // Declare player as nullable BaseCharacter
         bool exit = false;
 
         while (!exit)
         {
             Console.Clear();
-            Console.WriteLine("Welcome to the RPG Game!");
-            Console.WriteLine("What would you like to do?");
-            Console.WriteLine("\n1. New Game");
-            Console.WriteLine("2. Load Game");
+            Console.WriteLine("Bem-vindo ao Jogo de RPG!");
+            Console.WriteLine("O que você gostaria de fazer?");
+            Console.WriteLine("\n1. Novo Jogo");
+            Console.WriteLine("2. Carregar Jogo");
             Console.WriteLine("3. Multiplayer");
-            Console.WriteLine("4. Exit");
+            Console.WriteLine("4. Sair");
 
-            Console.Write("\nSelect an option: ");
-            string choice = Console.ReadLine();
+            Console.Write("\nSelecione uma opção: ");
+            string? choice = Console.ReadLine();
 
             switch (choice)
             {
                 case "1":
-                    player = CreateNewCharacter(); // Create a new character
+                    player = CreateNewCharacter(); // Criar um novo personagem
                     if (player != null)
                     {
-                        Game.Start(player); // Start the game with the new character
+                        Game.Start(player); // Iniciar o jogo com o novo personagem
                     }
                     else
                     {
-                        Console.WriteLine("Invalid character class selected. Please try again.");
+                        Console.WriteLine("Classe de personagem inválida. Tente novamente.");
                     }
                     break;
                 case "2":
-                    player = SaveSystem.LoadCharacter(); // Load saved character
+                    player = SaveSystem.LoadCharacter(); // Carregar personagem salvo
                     if (player != null)
                     {
-                        Game.Start(player); // Start the game with the loaded character
+                        Game.Start(player); // Iniciar o jogo com o personagem carregado
                     }
                     else
                     {
-                        Console.WriteLine("No saved character found.");
+                        Console.WriteLine("Nenhum personagem salvo encontrado.");
                     }
                     break;
                 case "3":
-                    Console.WriteLine("Multiplayer is not implemented yet.");
+                    Console.WriteLine("Multiplayer não implementado ainda.");
                     break;
                 case "4":
                     exit = true;
-                    Console.WriteLine("Exiting the game. Goodbye!");
+                    Console.WriteLine("Saindo do jogo. Até logo!");
                     break;
                 default:
-                    Console.WriteLine("Invalid option. Please select a valid option.");
+                    Console.WriteLine("Opção inválida. Por favor, selecione uma opção válida.");
                     break;
             }
 
             if (!exit)
             {
-                Console.WriteLine("\nPress any key to return to the menu...");
+                Console.WriteLine("\nPressione qualquer tecla para voltar ao menu...");
                 Console.ReadKey();
             }
         }
     }
 
-    private static BaseCharacter CreateNewCharacter()
+    private static BaseCharacter? CreateNewCharacter()
     {
         Console.Clear();
-        Console.WriteLine("Choose your character class:");
-        Console.WriteLine("1. Knight");
-        Console.WriteLine("2. Mage");
-        Console.WriteLine("3. Archer");
+        Console.WriteLine("Escolha sua classe de personagem:");
+        Console.WriteLine("1. Cavaleiro");
+        Console.WriteLine("2. Mago");
+        Console.WriteLine("3. Arqueiro");
 
-        Console.Write("\nSelect a class: ");
-        string classChoice = Console.ReadLine();
+        Console.Write("\nSelecione uma classe: ");
+        string? classChoice = Console.ReadLine();
 
-        // Use a switch expression to return the correct character, or null if invalid.
+        // Verificar se classChoice não é null e retornar o personagem correto
+        if (string.IsNullOrEmpty(classChoice))
+        {
+            return null; // Se o input for inválido ou vazio, retornar null
+        }
+
         return classChoice switch
         {
             "1" => CharacterFactory.PlayerFactory("knight"),
             "2" => CharacterFactory.PlayerFactory("mage"),
             "3" => CharacterFactory.PlayerFactory("archer"),
-            _ => null // Return null if the choice is invalid
+            _ => null // Retorna null se a escolha for inválida
         };
     }
 }

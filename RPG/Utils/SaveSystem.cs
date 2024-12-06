@@ -1,56 +1,95 @@
-﻿using RPG.Characters;
+﻿using System;
+using System.IO;
 using System.Text.Json;
+using RPG.Characters;
+using RPG.Utils;
 
 namespace RPG.Utils
 {
-    internal class SaveSystem
+    public static class SaveSystem
     {
-        private static readonly string saveFilePath = "savefile.json";
+        private static string saveFilePath = "savegame.json";
 
-        // Save the character's memento to a file
+        // Método para salvar o estado do personagem
         public static void SaveCharacter(BaseCharacter character)
         {
             try
             {
-                var memento = character.SaveState(); // Create a memento
+                var memento = new CharacterMemento(
+                    character.GetType().Name,
+                    character.Health,
+                    character.Defense,
+                    character.AttackPower
+                );
+
                 string json = JsonSerializer.Serialize(memento);
                 File.WriteAllText(saveFilePath, json);
-                Console.WriteLine("Game saved successfully!");
+
+                Console.WriteLine("Estado do personagem salvo com sucesso!");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving game: {ex.Message}");
+                Console.WriteLine($"Erro ao salvar o personagem: {ex.Message}");
             }
         }
 
-        // Load the character's state from a file and apply it
+        // Método para carregar o estado do personagem a partir de um arquivo
         public static BaseCharacter LoadCharacter()
         {
             try
             {
-                if (!File.Exists(saveFilePath))
+                if (File.Exists(saveFilePath))
                 {
-                    Console.WriteLine("No save file found.");
-                    return null;
+                    string json = File.ReadAllText(saveFilePath);
+                    CharacterMemento? memento = JsonSerializer.Deserialize<CharacterMemento>(json);
+
+                    if (memento == null)
+                    {
+                        Console.WriteLine("Erro ao carregar personagem: Memento não encontrado.");
+                        return null!;
+                    }
+
+                    // Cria o personagem a partir do Memento
+                    BaseCharacter character = CharacterFactory.PlayerFactory(memento.ClassName);
+
+                    // Atualiza os stats com os valores do Memento
+                    character.UpdateStats(memento.Health, memento.Defense, memento.AttackPower);
+
+                    Console.WriteLine("Personagem carregado com sucesso!");
+                    return character;
                 }
-
-                string json = File.ReadAllText(saveFilePath);
-                var memento = JsonSerializer.Deserialize<CharacterMemento>(json);
-
-                if (memento == null)
+                else
                 {
-                    Console.WriteLine("Error: Invalid save file.");
-                    return null;
+                    Console.WriteLine("Nenhum arquivo de salvamento encontrado.");
+                    return null!;
                 }
-
-                return CharacterFactory.PlayerFactory(memento); // Use the overloaded method
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading game: {ex.Message}");
-                return null;
+                Console.WriteLine($"Erro ao carregar personagem: {ex.Message}");
+                return null!;
             }
         }
 
+        // Método para deletar o arquivo de salvamento
+        public static void DeleteSave()
+        {
+            try
+            {
+                if (File.Exists(saveFilePath))
+                {
+                    File.Delete(saveFilePath);
+                    Console.WriteLine("Arquivo de salvamento deletado com sucesso.");
+                }
+                else
+                {
+                    Console.WriteLine("Nenhum arquivo de salvamento encontrado.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao deletar o arquivo de salvamento: {ex.Message}");
+            }
+        }
     }
 }
