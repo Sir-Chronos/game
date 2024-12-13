@@ -64,5 +64,9 @@ Este é um jogo de batalha em português, desenvolvido em C#, onde jogadores enf
    - **Exemplo**: O jogo salva o estado de vida, posição e status dos personagens em momentos-chave e permite restaurar caso o jogador queira voltar.  
    - **Benefício**: Proporciona flexibilidade e segurança no avanço do jogo, evitando perdas de progresso.
 
+## 📽️ Vídeo do Projeto
+   - [Vídeo Apresentação](https://drive.google.com/file/d/1_5hsEQsQuocoQXKVQJuxWCJ0jrEgCGka/view?usp=sharing)
+
+
 ## ✨ Autores
 Desenvolvido por **Luana**, **Kelvin** e **Gabriel Teodoro**
